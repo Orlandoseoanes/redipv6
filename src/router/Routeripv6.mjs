@@ -19,7 +19,7 @@ router.post('/ipv6', (req, res) => {
         const size = BigInt(Math.pow(2, newPrefixLength - prefixLength));
 
         // Divide el rango completo en subredes según el número especificado
-        const subnets = {};
+        const subnets = [];
         for (let i = 0; i < subnetsCount; i++) {
             const subnetStart = ip6.normalize(ip6.abbreviate(ip6.divideSubnet(startIPv6, prefixLength, newPrefixLength, subnetsCount, true)[i]));
             let subnetEnd;
@@ -29,14 +29,14 @@ router.post('/ipv6', (req, res) => {
                 const nextSubnetStart = ip6.normalize(ip6.abbreviate(ip6.divideSubnet(startIPv6, prefixLength, newPrefixLength, subnetsCount, true)[i + 1]));
                 subnetEnd = nextSubnetStart;
             }
-            subnets[`subred${i + 1}`] = [{
+            subnets.push({
                 value: `${subnetStart}/${newPrefixLength}`,
                 ipRange: {
                     start: subnetStart,
                     end: subnetEnd
                 },
                 broadcastAddr: subnetEnd
-            }];
+            });
         }
 
         // Envia el resultado como respuesta
@@ -46,6 +46,7 @@ router.post('/ipv6', (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
+
 
 
 router.post('/ipv6pdf', (req, res) => {
